@@ -330,6 +330,7 @@ public class BusReservationSystem {
 
                 for (Route r : routes) {
                     if (r != null && r.source.equals(src) && r.destination.equals(dest) && r.time.equals(time)) {
+                        r.distance = dist;
                         r.bus.seats[seat - 1] = true;
                         r.bus.bookings[seat - 1] = new Passenger(name, age, seat);
                         break;
