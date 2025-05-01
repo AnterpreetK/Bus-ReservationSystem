@@ -58,7 +58,10 @@ public class BusReservationSystem {
                 System.out.println("3. Update Route");
                 System.out.println("4. Delete Route");
                 System.out.println("5. Sort Routes by Time");
-                System.out.println("6. Back to Main Menu");
+                System.out.println("6. Search Route");
+                System.out.println("7. Search Booking by Name");
+                System.out.println("8. Update Booking Details");
+                System.out.println("9. Back to Main Menu");
                 System.out.print("Choose option: ");
                 option = getIntInput();
 
@@ -68,10 +71,14 @@ public class BusReservationSystem {
                     case 3 -> updateRoute();
                     case 4 -> deleteRoute();
                     case 5 -> sortRoutesByTime();
-                    case 6 -> System.out.println("Returning to Main Menu...");
+                    case 6 -> searchRoute(); //
+                    case 7 -> searchBookingByName(); //
+                    case 8 -> updateBookingDetails(); //
+                    case 9 -> System.out.println("Returning to Main Menu...");
                     default -> System.out.println("Invalid option. Try again!");
                 }
-            } while (option != 6);
+
+            } while (option != 9);
         } else {
             System.out.println("Incorrect password!");
         }
@@ -137,6 +144,93 @@ public class BusReservationSystem {
 
         System.out.println("Route updated successfully!");
     }
+
+    static void searchRoute() {
+        System.out.print("Enter source or destination to search: ");
+        String query = sc.nextLine().toLowerCase();
+
+        boolean found = false;
+        for (int i = 0; i < routes.length; i++) {
+            if (routes[i] != null &&
+                    (routes[i].source.toLowerCase().contains(query) || routes[i].destination.toLowerCase().contains(query))) {
+                if (!found) {
+                    System.out.println("\nSearch Results:");
+                    System.out.printf("%-4s %-20s %-20s %-12s %-10s\n", "No.", "Source", "Destination", "Time", "Distance");
+                    found = true;
+                }
+                System.out.printf("%-4d %-20s %-20s %-12s %-10d\n", (i + 1), routes[i].source, routes[i].destination, routes[i].time, routes[i].distance);
+            }
+        }
+
+        if (!found) {
+            System.out.println("No routes found!");
+        }
+    }
+
+    static void searchBookingByName() {
+        System.out.print("Enter passenger name: ");
+        String name = sc.nextLine().toLowerCase();
+
+        boolean found = false;
+        for (Route route : routes) {
+            if (route != null) {
+                for (int i = 0; i < route.bus.totalSeats; i++) {
+                    Passenger p = route.bus.bookings[i];
+                    if (p != null && p.name.toLowerCase().contains(name)) {
+                        if (!found) {
+                            System.out.println("\nBookings Found:");
+                            found = true;
+                        }
+                        System.out.println("Route: " + route.source + " → " + route.destination +
+                                " | Time: " + route.time + " | Seat: " + p.seatNumber + " | Age: " + p.age);
+                    }
+                }
+            }
+        }
+
+        if (!found) {
+            System.out.println("No bookings found for that name.");
+        }
+    }
+
+    static void updateBookingDetails() {
+        displayRoutes();
+        System.out.print("Select route number: ");
+        int routeIndex = getIntInput() - 1;
+
+        if (routeIndex < 0 || routeIndex >= routes.length || routes[routeIndex] == null) {
+            System.out.println("Invalid route!");
+            return;
+        }
+
+        Bus bus = routes[routeIndex].bus;
+        System.out.print("Enter seat number: ");
+        int seat = getIntInput();
+
+        if (seat <= 0 || seat > bus.totalSeats || bus.bookings[seat - 1] == null) {
+            System.out.println("No booking found on this seat.");
+            return;
+        }
+
+        Passenger p = bus.bookings[seat - 1];
+
+        System.out.print("New name (current: " + p.name + "): ");
+        String newName = sc.nextLine();
+        if (!newName.isBlank()) p.name = newName;
+
+        System.out.print("New age (current: " + p.age + "): ");
+        String newAge = sc.nextLine();
+        if (!newAge.isBlank()) {
+            try {
+                p.age = Integer.parseInt(newAge);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid age input. Keeping old age.");
+            }
+        }
+
+        System.out.println("Booking details updated!");
+    }
+
 
     static void deleteRoute() {
         displayRoutes();

@@ -1,0 +1,2 @@
+Chandigarh,Delhi,09:00 AM,250,anter,19,2
+Bangalore,Chennai,06:00 PM,350,Anterpreet Kaur,19,1
